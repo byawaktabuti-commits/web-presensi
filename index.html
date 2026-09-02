@@ -23,29 +23,29 @@
 </head>
 <body>
     
-    <iframe id="gas-frame" src="https://script.google.com/macros/s/AKfycby8JxnCGLb0YYTIWm3Dde5NqR8ZuvBeN70bLr36n3dibzVbrI20bAadJwHhMDtzRSt4/exec" allow="geolocation"></iframe>
+    <iframe id="gas-frame" src="https://script.google.com/macros/s/AKfycbw-99zpHTj4weOqRlC0dJ7fUpLe3vgBcH4E4P3m2meUwwL7c58AR29vgZNRiJ60HOxf/exec" allow="geolocation"></iframe>
     
-    <script>
-        // Jembatan komunikasi langsung ke Iframe (100% Menggunakan LocalStorage GitHub)
-        window.addEventListener('message', function(event) {
-            try {
-                let data = JSON.parse(event.data);
+    <!-- JEMBATAN MEMORI ANTI-HAPUS (POSTMESSAGE SCRIPT) -->
+<script>
+    window.addEventListener('message', function(event) {
+        try {
+            let data = JSON.parse(event.data);
+            
+            if (data.action === 'saveData') {
+                localStorage.setItem(data.key, JSON.stringify(data.payload));
+            } 
+            else if (data.action === 'loadData') {
+                let saved = localStorage.getItem(data.key);
+                let response = { action: 'returnData', key: data.key, payload: saved ? JSON.parse(saved) : null };
                 
-                if (data.action === 'saveData') {
-                    localStorage.setItem(data.key, JSON.stringify(data.payload));
-                } 
-                else if (data.action === 'loadData') {
-                    let saved = localStorage.getItem(data.key);
-                    let response = { action: 'returnData', key: data.key, payload: saved ? JSON.parse(saved) : null };
-                    
-                    // Membalas langsung secara mutlak ke jendela Apps Script
-                    event.source.postMessage(JSON.stringify(response), event.origin);
-                }
-                else if (data.action === 'deleteData') {
-                    localStorage.removeItem(data.key);
-                }
-            } catch(e) {}
-        });
-    </script>
+                // Pakai '*' agar tidak diblokir oleh keamanan ketat Safari / Chrome HP
+                event.source.postMessage(JSON.stringify(response), '*');
+            }
+            else if (data.action === 'deleteData') {
+                localStorage.removeItem(data.key);
+            }
+        } catch(e) {}
+    });
+</script>
 </body>
 </html>
