@@ -23,13 +23,14 @@
 </head>
 <body>
     
-    <iframe id="gas-frame" src="https://script.google.com/macros/s/AKfycbw-99zpHTj4weOqRlC0dJ7fUpLe3vgBcH4E4P3m2meUwwL7c58AR29vgZNRiJ60HOxf/exec" allow="geolocation"></iframe>
+    <iframe id="gas-frame" src="https://script.google.com/macros/s/AKfycbwQubV_OYLVIxPsT3VofpBmG3RFO5yU1QWLdWQxzAJqldeW9PWK7rX1I_gw0aHXgREm/exec" allow="geolocation"></iframe>
     
     <!-- JEMBATAN MEMORI ANTI-HAPUS (POSTMESSAGE SCRIPT) -->
 <script>
     window.addEventListener('message', function(event) {
         try {
-            let data = JSON.parse(event.data);
+            // Keamanan ganda: Jika HP mengirim bentuk Object (bukan teks), tetap bisa dibaca
+            let data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
             
             if (data.action === 'saveData') {
                 localStorage.setItem(data.key, JSON.stringify(data.payload));
@@ -38,8 +39,8 @@
                 let saved = localStorage.getItem(data.key);
                 let response = { action: 'returnData', key: data.key, payload: saved ? JSON.parse(saved) : null };
                 
-                // Pakai '*' agar tidak diblokir oleh keamanan ketat Safari / Chrome HP
-                event.source.postMessage(JSON.stringify(response), '*');
+                // Balas langsung ke pengetuk
+                if (event.source) event.source.postMessage(JSON.stringify(response), '*');
             }
             else if (data.action === 'deleteData') {
                 localStorage.removeItem(data.key);
@@ -47,5 +48,4 @@
         } catch(e) {}
     });
 </script>
-</body>
 </html>
